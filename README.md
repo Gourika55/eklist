@@ -43,6 +43,10 @@ Use **Presenter sign-in** once for provider-powered workflows and uploads. The s
 
 [Open the continuous screen recorder](https://eklist.vercel.app/record.html) to record an actual query-to-export session. Recordings stay in the browser until downloaded; do not reload before saving.
 
+## Watch the 90-second presentation
+
+[Play the presentation with the original 3D motion intro](docs/assets/EkList-presentation-90s.mp4). 10 seconds of animated source cards lead into 80 seconds of actual query-to-CSV recording. 1440×900, silent for live presenter narration.
+
 ## Watch the verified query demo
 
 [Watch the actual 1440×900 query-to-CSV recording](docs/assets/EkList-judge-demo.mp4). It shows the local full backend using the disclosed reviewed-source pack: two verified college records and five 2026 funding events. Only the initial idle time was trimmed; recorder controls are hidden. Both deployed query-to-CSV API flows were separately tested successfully. [College CSV](examples/verified/Kanpur-BTech-verified-fees.csv) · [Funding CSV](examples/verified/India-education-funding-2026-verified.csv).
