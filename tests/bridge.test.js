@@ -15,3 +15,9 @@ test('public catalogue query forces local rules and keeps service token private'
  global.fetch=async(url,o)=>{sent=o;return new Response('{}')};
  try{let res=response();await handler({headers:{},method:'POST',url:'/api/bridge?path=query',body:{query:'50 colleges in Delhi',ai:true}},res);assert.equal(res.code,200);assert.equal(JSON.parse(sent.body).ai,false);assert.equal(res.headers['WWW-Authenticate'],undefined)}finally{global.fetch=old}
 });
+test('presenter login creates a signed cookie and unlocks protected routes',async()=>{
+ Object.assign(process.env,env);let res=response();await handler({headers:{host:'eklist.vercel.app',origin:'https://eklist.vercel.app'},method:'POST',url:'/api/bridge?path=session',body:{username:'demo',password:'test-password'}},res);
+ assert.equal(res.code,200);assert.match(res.headers['Set-Cookie'],/HttpOnly; Secure; SameSite=Strict/);let cookie=res.headers['Set-Cookie'].split(';')[0];const old=global.fetch;global.fetch=async()=>new Response('{}');
+ try{res=response();await handler({headers:{cookie},method:'GET',url:'/api/bridge?path=research/jobs'},res);assert.equal(res.code,200);res=response();await handler({headers:{cookie:cookie+'tampered'},method:'GET',url:'/api/bridge?path=research/jobs'},res);assert.equal(res.code,403)}finally{global.fetch=old}
+});
+test('presenter login rejects wrong password without issuing cookie',async()=>{Object.assign(process.env,env);let res=response();await handler({headers:{},method:'POST',url:'/api/bridge?path=session',body:{username:'demo',password:'wrong'}},res);assert.equal(res.code,403);assert.equal(res.headers['Set-Cookie'],undefined)});

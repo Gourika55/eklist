@@ -1,4 +1,4 @@
-import {timingSafeEqual} from 'node:crypto';
+import {timingSafeEqual,createHmac} from 'node:crypto';
 export const config={maxDuration:60};
 const equal=(a,b)=>{const x=Buffer.from(a||''),y=Buffer.from(b||'');return x.length===y.length&&timingSafeEqual(x,y)};
 export default async function handler(req,res){
@@ -13,7 +13,22 @@ export default async function handler(req,res){
   // Uploads, saved research and provider-powered mutations retain authentication.
   const publicRead=req.method==='GET'&&['health','catalog','packs','packs/records','benchmark','source-packs'].includes(path);
   const publicQuery=req.method==='POST'&&['plan','query'].includes(path);
-  const signedIn=!!user&&!!password&&equal(req.headers.authorization,'Basic '+Buffer.from(`${user}:${password}`).toString('base64'));
+  const cookie=(req.headers.cookie||'').split(';').map(x=>x.trim()).find(x=>x.startsWith('eklist_session='))?.split('=').slice(1).join('=')||'';
+  const [expires,signature]=cookie.split('.');
+  const validSession=Number(expires)>Date.now()&&Number(expires)<Date.now()+9*3600000&&equal(signature,createHmac('sha256',token).update('presenter:'+expires).digest('hex'));
+  if(path==='session'){
+    if(req.method==='GET')return res.status(200).json({authenticated:!!validSession});
+    const origin=req.headers.origin;
+    if(origin&&origin!==new URL('https://'+req.headers.host).origin)return res.status(403).json({error:'Invalid request origin'});
+    let input;try{input=typeof req.body==='string'?JSON.parse(req.body):req.body}catch{return res.status(400).json({error:'Invalid request'})}
+    if(input?.logout){res.setHeader('Set-Cookie','eklist_session=; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=0');return res.status(200).json({authenticated:false})}
+    if(!user||!password||!equal(input?.username,user)||!equal(input?.password,password))return res.status(403).json({error:'Incorrect presenter credentials'});
+    const exp=String(Date.now()+8*3600000);const sig=createHmac('sha256',token).update('presenter:'+exp).digest('hex');
+    res.setHeader('Set-Cookie',`eklist_session=${exp}.${sig}; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=28800`);
+    return res.status(200).json({authenticated:true});
+  }
+  if(req.method==='POST'&&validSession&&req.headers.origin&&req.headers.origin!=='https://'+req.headers.host)return res.status(403).json({error:'Invalid request origin'});
+  const signedIn=validSession||!!user&&!!password&&equal(req.headers.authorization,'Basic '+Buffer.from(`${user}:${password}`).toString('base64'));
   if(!publicRead&&!publicQuery&&!signedIn)return res.status(403).json({error:'This action requires operator access. Public catalogue search and data-pack exports are available without sign-in.'});
   incoming.searchParams.delete('path');
   const upstream=new URL(base);
