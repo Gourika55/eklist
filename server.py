@@ -7,6 +7,7 @@ from urllib.parse import urlsplit,parse_qs
 from catalog import metadata,rules_plan,validate_plan,query_catalog
 from subscribers import demo,load_private,import_csv
 from ingest import xlsx_rows
+from hosting import hosted,authorized,validate_hosting
 BASE=Path(__file__).resolve().parent;ROOT=BASE/'dist'
 if (BASE/'.env').exists():
     for line in (BASE/'.env').read_text().splitlines():
@@ -14,7 +15,10 @@ if (BASE/'.env').exists():
             k,v=line.split('=',1);os.environ.setdefault(k.strip(),v.strip())
 KEY=os.getenv('NVIDIA_API_KEY',os.getenv('EKLIST_API_KEY',''));MODEL=os.getenv('EKLIST_MODEL','nvidia/nemotron-3.5-super-vl-120b-a12b')
 API=os.getenv('EKLIST_API_BASE','https://integrate.api.nvidia.com/v1').rstrip('/');SERPER=os.getenv('SERPER_API_KEY','')
-METADATA=metadata();CACHE={};LOCK=threading.Lock();COUNTERS={'model_calls':0,'search_calls':0,'plan_cache_hits':0,'search_cache_hits':0};PRIVATE=None
+validate_hosting()
+try:METADATA=metadata()
+except Exception:METADATA={'raw_records':0,'entities':0,'sources':[],'states':[],'districts':[],'categories':['college','university','standalone','research','vidyalaxmi']}
+CACHE={};LOCK=threading.Lock();COUNTERS={'model_calls':0,'search_calls':0,'plan_cache_hits':0,'search_cache_hits':0};PRIVATE=None
 
 def tls_context():
     context=ssl.create_default_context()
@@ -88,9 +92,9 @@ class Handler(SimpleHTTPRequestHandler):
     def reply(self,status,body):
         data=json.dumps(body,ensure_ascii=False).encode();self.send_response(status);self.send_header('Content-Type','application/json; charset=utf-8');self.send_header('Cache-Control','no-store');self.send_header('Content-Length',str(len(data)));self.end_headers();self.wfile.write(data)
     def allowed(self):
-        host=self.headers.get('Host','').split(':')[0];origin=self.headers.get('Origin')
-        return host in ('localhost','127.0.0.1') and (not origin or urlsplit(origin).netloc==self.headers.get('Host'))
+        return authorized(self.headers)
     def do_GET(self):
+        if urlsplit(self.path).path=='/healthz':return self.reply(200,{'status':'running'})
         if not self.allowed():return self.reply(403,{'error':'Local access only'})
         path=urlsplit(self.path).path
         if path=='/api/opportunities':return self.reply(200,{'jobs':opportunities.history()})
@@ -113,13 +117,14 @@ class Handler(SimpleHTTPRequestHandler):
                     self.send_response(200);self.send_header('Content-Type','text/csv; charset=utf-8');self.send_header('Content-Disposition',f'attachment; filename="eklist-{job_id[:8]}-{kind}.csv"');self.send_header('Cache-Control','no-store');self.send_header('Content-Length',str(len(content)));self.end_headers();self.wfile.write(content);return
                 return self.reply(200,{**job,'rows':research_results(job)})
             except ValueError as ex:return self.reply(404,{'error':str(ex)})
-        if path=='/api/health':return self.reply(200,{'ai':bool(KEY),'serper':bool(SERPER),'model':MODEL,'database':True,'usage':COUNTERS})
+        if path=='/api/health':return self.reply(200,{'ai':bool(KEY),'serper':bool(SERPER),'model':MODEL,'database':METADATA['raw_records']>0,'records':METADATA['raw_records'],'usage':COUNTERS})
         if path=='/api/catalog':return self.reply(200,METADATA)
         if path=='/api/benchmark':
             p=BASE/'reports'/'benchmark.json';return self.reply(200,json.loads(p.read_text()) if p.exists() else {'status':'Not run'})
         if path=='/api/source-packs':
             p=BASE/'data'/'source-packs.json';return self.reply(200,json.loads(p.read_text()) if p.exists() else {'sources':[]})
         if path.startswith('/api/'):return self.reply(404,{'error':'Unknown endpoint'})
+        if hosted():return self.reply(404,{'error':'API service only'})
         return super().do_GET()
     def do_POST(self):
         global PRIVATE
@@ -165,6 +170,7 @@ class Handler(SimpleHTTPRequestHandler):
                 return self.reply(200,search_gaps(query))
             if path=='/api/subscribers':
                 if data.get('private'):
+                    if hosted():return self.reply(403,{'error':'Private local-file shortcut is disabled on hosted services. Use CSV upload.'})
                     if PRIVATE is None:PRIVATE=load_private()
                     result=PRIVATE
                 else:result=demo()
@@ -177,5 +183,5 @@ class Handler(SimpleHTTPRequestHandler):
 if __name__=='__main__':
     recover()
     opportunities.recover()
-    port=int(os.getenv('PORT','4173'));print(f'EkList: http://localhost:{port} | {METADATA["raw_records"]} source records | model configured: {bool(KEY)} | search configured: {bool(SERPER)}',flush=True)
-    ThreadingHTTPServer(('127.0.0.1',port),Handler).serve_forever()
+    port=int(os.getenv('PORT','4174'));print(f'EkList: http://localhost:{port} | {METADATA["raw_records"]} source records | model configured: {bool(KEY)} | search configured: {bool(SERPER)}',flush=True)
+    ThreadingHTTPServer(('0.0.0.0' if hosted() else '127.0.0.1',port),Handler).serve_forever()

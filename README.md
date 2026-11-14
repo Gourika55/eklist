@@ -19,6 +19,10 @@ Built for **INFRA SHIFT · PS1: AI-Powered Data Intelligence Platform**. The int
 | General import | CSV/XLSX + column mapping | Reconciled working list and source records |
 | Subscriber review | CSV containing email and optional profile URLs | Reviewable associations; confirmed groups retain all emails |
 
+## Deploy the full stack
+
+Use **Vercel for the frontend/API bridge and Render for the Python backend**. [Follow the complete deployment guide](docs/DEPLOYMENT.md), including the catalogue seed and server-side provider configuration. Free Render restores the catalogue on cold start but does not preserve research history across restarts. This is separate from the local quick start below.
+
 ## Quick start
 
 Requires **Python 3.11+** and a modern browser. **Node 18+** runs JavaScript tests. The Python server uses standard-library modules; no pip installation is needed. Install Poppler's `pdftotext` separately if you want text-based PDF extraction.

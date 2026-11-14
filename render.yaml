@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: eklist-api
+    runtime: docker
+    plan: free
+    healthCheckPath: /healthz
+    envVars:
+      - key: EKLIST_HOSTED
+        value: "1"
+      - key: EKLIST_BACKEND_TOKEN
+        generateValue: true
+      - key: NVIDIA_API_KEY
+        sync: false
+      - key: SERPER_API_KEY
+        sync: false
+      - key: EKLIST_MODEL
+        value: nvidia/nemotron-3.5-super-vl-120b-a12b
+      - key: EKLIST_CATALOG_SEED_URL
+        sync: false
+      - key: EKLIST_CATALOG_SEED_SHA256
+        sync: false

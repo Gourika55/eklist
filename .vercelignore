@@ -1,0 +1,8 @@
+.env*
+!.env.example
+data/
+private/
+reports/
+.ml.ai/
+__pycache__/
+*.pptx

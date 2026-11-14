@@ -1,0 +1,18 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "version": 2,
+  "framework": null,
+  "buildCommand": "node scripts/build-frontend.mjs",
+  "outputDirectory": "public",
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "/api/bridge?path=:path*"
+    }
+  ],
+  "functions": {
+    "api/bridge.js": {
+      "maxDuration": 60
+    }
+  }
+}
