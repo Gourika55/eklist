@@ -15,7 +15,7 @@ EkList helps **students discover opportunities** and helps **placement teams, ca
 3. **Inspect** original records, supported claims, matching decisions and missing fields.
 4. **Export** a CSV with source evidence for the next step in your workflow.
 
-The public frontend may ask for the operator’s demo sign-in before protected API calls. The backend homepage is a service landing page; use the frontend for the product.
+Public catalogue search and public data-pack browsing/export require no sign-in. Provider-powered research, uploads and saved histories retain operator access. Anonymous catalogue queries use deterministic local rules. The backend homepage is a service landing page; use the frontend for the product.
 
 EkList is a local-first data and lead research workspace. Ask in English or Hindi, search an imported institution catalogue, assemble public-source research, reconcile uploaded tables, and export CSVs with their evidence.
 
