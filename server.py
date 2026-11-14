@@ -84,6 +84,7 @@ def research_local(query):
 
 RESEARCH=ResearchEngine(research_llm,search_gaps,research_local)
 import opportunities
+import packs
 OPPORTUNITIES=opportunities.Engine(research_llm,search_gaps)
 
 class Handler(SimpleHTTPRequestHandler):
@@ -97,6 +98,14 @@ class Handler(SimpleHTTPRequestHandler):
         if urlsplit(self.path).path=='/healthz':return self.reply(200,{'status':'running'})
         if not self.allowed():return self.reply(403,{'error':'Local access only'})
         path=urlsplit(self.path).path
+        if path=='/api/packs':return self.reply(200,packs.overview())
+        if path=='/api/packs/records':
+            try:
+                params=parse_qs(urlsplit(self.path).query);plan=json.loads(params.get('plan',['{}'])[0]);plan=plan or {'category':params.get('category',['all'])[0]};result=packs.search(plan,params.get('q',[''])[0][:200])
+                if params.get('export'):
+                    content=packs.csv_export(result,params.get('commercial',['0'])[0]=='1').encode('utf-8-sig');self.send_response(200);self.send_header('Content-Type','text/csv; charset=utf-8');self.send_header('Content-Disposition','attachment; filename=eklist-opportunity-pack.csv');self.send_header('Cache-Control','no-store');self.send_header('Content-Length',str(len(content)));self.end_headers();self.wfile.write(content);return
+                return self.reply(200,result)
+            except (ValueError,TypeError):return self.reply(422,{'error':'Invalid filters, or commercial reuse is not documented for this pack.'})
         if path=='/api/opportunities':return self.reply(200,{'jobs':opportunities.history()})
         if path.startswith('/api/opportunities/'):
             try:
@@ -134,6 +143,11 @@ class Handler(SimpleHTTPRequestHandler):
             max_size=8*1024*1024 if self.path in ('/api/subscribers/import','/api/files/preview') else 16000
             if not 0<size<=max_size:return self.reply(413,{'error':'Request exceeds endpoint size limit'})
             data=json.loads(self.rfile.read(size));path=urlsplit(self.path).path
+            if path=='/api/packs/refresh':return self.reply(202,packs.start_refresh(data.get('category'),research_llm))
+            if path=='/api/packs/query':
+                query=data.get('query','')
+                if not isinstance(query,str) or not 3<=len(query)<=2000:raise ValueError('Enter a query of 3–2000 characters')
+                p=research_llm(packs.PLAN_PROMPT,query);p['query']=query;return self.reply(200,packs.search(p))
             if path=='/api/opportunities':return self.reply(202,OPPORTUNITIES.start(data.get('query',''),data.get('kind','')))
             if path=='/api/research/jobs':return self.reply(202,RESEARCH.start(data.get('query','')))
             if path=='/api/files/preview':
