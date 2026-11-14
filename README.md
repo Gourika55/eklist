@@ -1,6 +1,21 @@
-# EkList
+![EkList — Scattered sources. One list. Evidence attached.](docs/assets/cover.svg)
 
-### Scattered sources. One list. Evidence attached.
+# EkList · Evidence-backed opportunity intelligence
+
+**[Open the live workspace](https://eklist.vercel.app)** · **[API service](https://eklist-api.onrender.com)** · **[Service health](https://eklist-api.onrender.com/healthz)** · **[Demo guide](docs/DEMO.md)**
+
+> A useful list needs more than names. It needs sources, eligibility, dates, identity checks and a clear explanation of what is still unknown.
+
+EkList helps **students discover opportunities** and helps **placement teams, campus coordinators and NGO programme teams** build reviewable outreach and research lists. Jobs are one part of the workspace: research, scholarships, volunteering, startup programmes and education organisations belong here too.
+
+### From a question to a usable CSV
+
+1. **Ask** in English or Hindi: “Find 50 colleges in Delhi.”
+2. **Retrieve** from the local catalogue or bounded public-source discovery.
+3. **Inspect** original records, supported claims, matching decisions and missing fields.
+4. **Export** a CSV with source evidence for the next step in your workflow.
+
+The public frontend may ask for the operator’s demo sign-in before protected API calls. The backend homepage is a service landing page; use the frontend for the product.
 
 EkList is a local-first data and lead research workspace. Ask in English or Hindi, search an imported institution catalogue, assemble public-source research, reconcile uploaded tables, and export CSVs with their evidence.
 
@@ -16,8 +31,24 @@ Built for **INFRA SHIFT · PS1: AI-Powered Data Intelligence Platform**. The int
 | Public research | Research objective | Downloaded public sources, entities, claims, evidence, gaps, CSV |
 | Remote jobs | India-based eligibility and supported conditions | Qualified / needs verification / excluded listings |
 | Hackathons | Supported country, mode, age and deadline conditions | Rule outcomes, cited fields, separate registration and event dates |
+| Opportunity library | Seven clusters + downloaded public source packs | Filterable source-linked records, graph and evidence CSV |
 | General import | CSV/XLSX + column mapping | Reconciled working list and source records |
 | Subscriber review | CSV containing email and optional profile URLs | Reviewable associations; confirmed groups retain all emails |
+
+## Explore the demo
+
+| Show this | What it demonstrates |
+|---|---|
+| “Find 50 colleges in Delhi” | Local retrieval from the institution index, exact identifiers and original rows |
+| Switch Hindi / English | Bilingual interface and query entry; names and source quotations stay verbatim |
+| Open a record | Trace a merged institution back to its individual source records |
+| Explore opportunity clusters | Research, NGOs, funding, founders, scholarships, education and events |
+| Open evidence / graph | See the source relationship and the quote behind a candidate claim |
+| Export CSV | Take the reviewed list and its evidence out of the dashboard |
+| Import CSV / XLSX | Map your own columns and reconcile a working list |
+| Jobs / hackathon query | Separate qualified listings from missing evidence and excluded results |
+
+**Development snapshot, 14 November 2026:** 74,847 institution rows / 73,401 distinct AISHE identifiers; 80 source-scoped opportunity-library candidates across seven clusters. Of these, 41 candidates came from the supplied local public-source packs. These measurements describe the local development corpus, not a guarantee that the hosted deployment has imported the same data or that every candidate is currently open.
 
 ## Deploy the full stack
 
@@ -123,7 +154,8 @@ Subscriber exports preserve all emails in confirmed groups. **EkList does not in
 
 ```text
 dist/                 Browser UI, reconciliation logic, crimson 3D theme
-server.py             Local HTTP server and API routes
+server.py             HTTP server, hosted landing page and protected API routes
+packs.py              Hash-verified local packs, cluster filtering and evidence exports
 catalog.py            Validated catalogue planning and SQLite queries
 ingest.py             Institution workbook importer
 research.py           Public downloads, claims, evidence and research jobs
@@ -137,12 +169,24 @@ docs/                 Demo guide and detailed implementation reference
 data/                 Generated local state; excluded from Git
 ```
 
+## Add downloaded data without committing it
+
+```sh
+python3 scripts/import-local-packs.py /path/to/manifest.json --root /path/to/eklist --audit-only
+python3 scripts/import-local-packs.py /path/to/manifest.json --root /path/to/eklist
+python3 scripts/refresh-packs.py
+```
+
+The importer verifies file hashes before extraction, keeps original retrieval dates and rejects unsupported quotations. No Git staging is required. A snapshot that contains only a portal shell does not count as a directory. Extraction is bounded, so the library is not an exhaustive mirror of source websites. See [pack ingestion and limitations](docs/OPPORTUNITY_PACKS.md).
+
 ## Test and evaluate
 
 ```sh
 python3 -m unittest discover -s tests -p 'test_*.py'
 npm test
 ```
+
+**Latest local validation:** 60 Python tests passed with national-catalogue integration enabled, plus 14 JavaScript tests. The pack API exported 80 rows with source URLs, hashes and identity quotations. Test counts measure software checks, not factual accuracy.
 
 Portable tests use fixtures and do not need API keys. National-catalogue integration tests are explicitly skipped unless enabled after importing the development workbooks:
 
@@ -162,8 +206,8 @@ The benchmark uses identifier-derived labels, not independent human labels. Its 
 
 Credentials, private contacts, downloaded snapshots, local databases and workspace reports are excluded from the public code distribution. Uploaded contacts are not sent to NVIDIA or Serper. Public research sends public queries and downloaded excerpts to configured providers.
 
-Before a shared deployment, add authentication, access isolation, rate limits, operational monitoring and appropriate data-retention controls. Persistent subscriber decisions, exhaustive cross-source entity resolution, arbitrary eligibility verification and independent factual certification are not implemented.
+Hosted mode uses a server-side backend token; the Vercel bridge supports a demo sign-in. Production multi-tenant access isolation, rate limits, operational monitoring and retention controls still need further work. Persistent subscriber decisions, exhaustive cross-source entity resolution, arbitrary eligibility verification and independent factual certification are not implemented.
 
 ## Engineering attribution
 
-This implementation was developed with Codex. ML.ai is an intended development tool for further ingestion, testing and maintenance work; this repository does not claim unperformed ML.ai contributions. NVIDIA is the configured runtime model provider; Serper supplies search discovery.
+This implementation was developed with Codex. The user supplied public-source packs collected through ML.ai; their manifests were hash-checked and usable snapshots were imported. ML.ai is a development agent, while NVIDIA provides runtime language-model calls. This does not imply ML.ai created every component of this repository. NVIDIA is the configured runtime model provider; Serper supplies search discovery.

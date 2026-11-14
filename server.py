@@ -96,6 +96,8 @@ class Handler(SimpleHTTPRequestHandler):
         return authorized(self.headers)
     def do_GET(self):
         if urlsplit(self.path).path=='/healthz':return self.reply(200,{'status':'running'})
+        if hosted() and urlsplit(self.path).path=='/':
+            data=(ROOT/'api-home.html').read_bytes();self.send_response(200);self.send_header('Content-Type','text/html; charset=utf-8');self.send_header('Content-Length',str(len(data)));self.send_header('Cache-Control','no-store');self.end_headers();self.wfile.write(data);return
         if not self.allowed():return self.reply(403,{'error':'Local access only'})
         path=urlsplit(self.path).path
         if path=='/api/packs':return self.reply(200,packs.overview())
