@@ -59,3 +59,11 @@ class PipelineTests(unittest.TestCase):
  def test_csv_export_union_of_gap_columns(self):
   j={'gaps':[{'reason':'none'},{'source':'a','reason':'failed'}]}
   self.assertIn('reason,source',r.export_csv(j,'gaps'))
+
+class FundingDateChecks(unittest.TestCase):
+ def test_old_round_is_excluded_even_when_other_year_mentioned_in_exclusion(self):
+  from research import results
+  job={'query':'Find startups funded in 2026. Exclude 2022 rounds.', 'plan':{'fields':['announcement_date']},'entities':[{'id':'x','name':'Example','type':'company'}], 'claims':[{'subject_id':'x','predicate':'announcement_date','value':'2022','evidence_id':'e'}], 'evidence':[{'id':'e','source_url':'https://example.com'}]}
+  self.assertEqual(results(job)[0]['criteria_status'],'excluded')
+  job['claims'][0]['value']='October 7, 2026'
+  self.assertEqual(results(job)[0]['criteria_status'],'needs_review')
