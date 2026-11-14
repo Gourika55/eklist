@@ -8,6 +8,7 @@ function notice(msg){$('#notice').textContent=msg;$('#notice').classList.toggle(
 $('#query-form').after($('#run-panel'));
 $('#run-panel').after($('#notice'));
 const buildFeedback=document.createElement('p');buildFeedback.id='build-feedback';buildFeedback.setAttribute('role','status');buildFeedback.setAttribute('aria-live','polite');$('#notice').after(buildFeedback);
+function startFlexibleResearch(query,reason='This request needs fields beyond the institution catalogue.'){const input=$('#research-query');if(!input)return notice('Research workspace is still loading. Please retry.');input.value=query;buildFeedback.textContent=reason+' Creating a research schema and finding source evidence…';$('#research-workspace').scrollIntoView({behavior:'smooth',block:'start'});$('#research-form').requestSubmit();}
 function datasetReady(count,showResults=true){buildFeedback.textContent=`${count} records ready. Review the dataset and export CSV below.`;if(showResults)$('#results').scrollIntoView({behavior:'smooth',block:'start'});}
 
 function getSaved(){try{return JSON.parse(localStorage.getItem(STORE)||'[]')}catch{return []}}
@@ -57,7 +58,7 @@ async function runCatalog(useAI){
  if(abort)return;const query=$('#query').value.trim();if(!query)return notice('Enter an institution request.');
  abort=new AbortController();$('#build').disabled=true;buildFeedback.textContent='Working on your request…';$('#run-panel').classList.remove('hidden');$('#run-detail').textContent='Planning filters, then querying the local institution index…';notice('');
  try{
-  const response=await fetch('/api/query',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query,ai:useAI??$('#use-ai').checked}),signal:AbortSignal.any([abort.signal,AbortSignal.timeout(65000)])});const res=await response.json();if(!response.ok)throw Error(res.error);
+  const response=await fetch('/api/query',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query,ai:useAI??$('#use-ai').checked}),signal:AbortSignal.any([abort.signal,AbortSignal.timeout(65000)])});const res=await response.json();if(!response.ok)throw Error(res.error);if(res.route==='research'){startFlexibleResearch(query,res.message);return;}
   catalogResult=res;const sourceMap=Object.fromEntries(res.sources.map(s=>[s.name,s]));
   raw=res.records.map(r=>({id:r.id,name:r.name,entityId:'aishe:'+r.entity_id,city:r.district,state:r.state,district:r.district,website:canonicalWebsite(r.website),management:r.management,university:r.original['university name']||'',address:'',phone:'',category:r.category,source:r.source,sourceUrl:'',sourceRow:r.source_row,retrieved:sourceMap[r.source]?.imported_at||'',original:r.original,supportingEvidence:r.supporting_evidence||[]}));
   decisions={};plan={city:{name:res.plan.district||res.plan.state||'India'},type:res.plan.category,engine:res.engine};lastMode='catalog';lastQuery=query;tab='records';sourceLog=res.sources.map(s=>({name:s.name,status:'Imported source',detail:`${s.rows} records. ${s.export_label}. SHA-256: ${s.sha256}. File provenance, not independent verification.`}));$('#table-search').value='';refresh();

@@ -27,18 +27,21 @@ def evidence_index():
 def metadata():
     with connection() as c:
         return {'raw_records':c.execute('SELECT count(*) FROM records').fetchone()[0],'entities':c.execute('SELECT count(DISTINCT entity_id) FROM records').fetchone()[0],'sources':[dict(r) for r in c.execute('SELECT * FROM sources')],'states':[r[0] for r in c.execute('SELECT DISTINCT state FROM records ORDER BY state')],'districts':[r[0] for r in c.execute('SELECT DISTINCT district FROM records ORDER BY district')],'categories':['college','university','standalone','research','vidyalaxmi']}
+class ResearchRequired(ValueError):
+    """The request requires evidence fields outside the catalogue schema."""
+
 def needs_research(query):
-    return bool(re.search(r'fees?|tuition|lakh|crore|b[ .-]?tech|fund(?:ed|ing)|investors?|scholarships?|placement|फीस|लाख',query,re.I))
+    return bool(re.search(r'fees?|tuition|lakh|crore|b[ .-]?tech|fund(?:ed|ing)|investors?|scholarships?|placement|placed|packages?|salary|nirf|naac|accredit|eligibility|partnership|फीस|लाख',query,re.I))
 
 def rules_plan(query,meta=None):
-    if needs_research(query):raise ValueError('Course, fee and funding requirements need public-source research; use Build research CSV. The catalogue does not contain these facts.')
+    if needs_research(query):raise ResearchRequired('Course, fee and funding requirements need public-source research; use Build research CSV. The catalogue does not contain these facts.')
     meta=meta or metadata();q=query.lower();q=re.sub('[०-९]',lambda m:str(ord(m[0])-ord('०')),q)
     category='college' if re.search(r'colleges?|महाविद्यालय|कॉलेज',q) else 'university' if re.search(r'universit|विश्वविद्यालय',q) else 'standalone' if re.search(r'standalone|polytechnic|पॉलिटेक्निक',q) else 'research' if re.search(r'research|r\s*&\s*d|अनुसंधान',q) else 'vidyalaxmi' if re.search(r'vidya.?la[kx]shmi|vidyalaxmi|विद्यालक्ष्मी',q) else None
     state=next((s for s in sorted(meta['states'],key=len,reverse=True) if s.lower() in q),None)
     if not state:state=next((s for a,s in ALIASES.items() if re.search(r'(?<!\w)'+re.escape(a)+r'(?!\w)',q)),None)
     district=next((s for s in sorted(meta['districts'],key=len,reverse=True) if len(s)>2 and s.lower() in q),None)
     num=re.search(r'\b(\d{1,5})\b',q);limit=int(num[1]) if num else 50
-    if not category:raise ValueError('Specify colleges, universities, standalone institutions, research institutes or Vidyalaxmi institutions.')
+    if not category:raise ResearchRequired('Specify colleges, universities, standalone institutions, research institutes or Vidyalaxmi institutions.')
     return validate_plan({'category':category,'state':state,'district':district,'limit':limit,'website_required':bool(re.search(r'with (?:official )?websites?|वेबसाइट सहित',q)),'management':'government' if re.search(r'government|सरकारी',q) else 'private' if re.search(r'private|निजी',q) else None,'name_contains':None},meta)
 def validate_plan(p,meta=None):
     meta=meta or metadata()

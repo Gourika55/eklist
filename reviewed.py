@@ -4,7 +4,7 @@ from pathlib import Path
 from datetime import date
 PACK=Path(__file__).parent/'config/reviewed/pack.json'
 def retrieve(query):
- q=query.lower()
+ q=query.lower().replace('-', ' ')
  if not PACK.exists():return None
  pack=json.loads(PACK.read_text());kind=None
  if re.search(r'b[ .-]?tech',q) and 'kanpur' in q and re.search(r'fees?|tuition',q):

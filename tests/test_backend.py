@@ -4,6 +4,11 @@ from subscribers import profile,reconcile,demo
 FIXTURE_META={'states':['Delhi','Uttar Pradesh'],'districts':['New Delhi','Lucknow'],'categories':['college','university','standalone','research','vidyalaxmi']}
 
 class BackendTests(unittest.TestCase):
+ def test_extended_requirements_request_research(self):
+  from catalog import ResearchRequired
+  for query in ['Find colleges in Delhi with 90% students placed','Find colleges with median package above 10 LPA','Find colleges with tuition below 5 lakh']:
+   with self.subTest(query=query),self.assertRaises(ResearchRequired):rules_plan(query,FIXTURE_META)
+
  def test_fee_query_never_silently_drops_constraints(self):
   with self.assertRaisesRegex(ValueError,'public-source research'):
    rules_plan('Find 50 btech colleges in kanpur that have fees less than 10 lakh for 4 years',FIXTURE_META)

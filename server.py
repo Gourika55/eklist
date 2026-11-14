@@ -4,7 +4,7 @@ import json,os,re,time,threading,urllib.request,urllib.error,base64,zipfile,io,c
 from http.server import ThreadingHTTPServer,SimpleHTTPRequestHandler
 from pathlib import Path
 from urllib.parse import urlsplit,parse_qs
-from catalog import metadata,rules_plan,validate_plan,query_catalog,needs_research
+from catalog import metadata,rules_plan,validate_plan,query_catalog,needs_research,ResearchRequired
 from subscribers import demo,load_private,import_csv
 from ingest import xlsx_rows
 from hosting import hosted,authorized,validate_hosting
@@ -34,6 +34,7 @@ def request_json(url,payload,key,header='Authorization',timeout=45):
     except Exception:raise RuntimeError('Provider unavailable or timed out') from None
 
 def plan_query(query,use_ai=True):
+    if needs_research(query):raise ResearchRequired('Additional evidence fields are required for this request.')
     cache_key=query.strip().casefold()
     if use_ai and KEY:
         with LOCK:cached=CACHE.get(cache_key)
@@ -44,7 +45,7 @@ def plan_query(query,use_ai=True):
             COUNTERS['model_calls']+=1
             result=request_json(API+'/chat/completions',{'model':MODEL,'messages':[{'role':'system','content':prompt},{'role':'user','content':query}],'max_tokens':1024,'temperature':0,'chat_template_kwargs':{'enable_thinking':False},'response_format':{'type':'json_object'}},KEY)
             content=result['choices'][0]['message']['content'];parsed=json.loads(re.sub(r'^```(?:json)?\s*|\s*```$','',content.strip()))
-            if parsed.get('unsupported'):raise ValueError(str(parsed['unsupported']))
+            if parsed.get('unsupported'):raise ResearchRequired(str(parsed['unsupported']))
             p=validate_plan(parsed,METADATA);out={'plan':p,'engine':'NVIDIA Nemotron','model':MODEL,'usage':result.get('usage',{}),'model_calls':1,'cached':False}
             with LOCK:CACHE[cache_key]=out
             return out
@@ -181,7 +182,9 @@ class Handler(SimpleHTTPRequestHandler):
             if path in ('/api/plan','/api/query'):
                 query=data.get('query','')
                 if not isinstance(query,str) or not query.strip() or len(query)>2000:raise ValueError('Enter a request of 1–2000 characters.')
-                planned=plan_query(query,data.get('ai',True))
+                try:planned=plan_query(query,data.get('ai',True))
+                except ResearchRequired as ex:
+                    return self.reply(200,{'route':'research','query':query,'reason':str(ex),'message':'This needs additional evidence fields. Continuing with a flexible research schema.'})
                 if path=='/api/plan':return self.reply(200,planned)
                 result=query_catalog(planned['plan']);result.update(planned);return self.reply(200,result)
             if path=='/api/search':

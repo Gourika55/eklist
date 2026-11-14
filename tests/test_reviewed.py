@@ -6,6 +6,8 @@ class ReviewedChecks(unittest.TestCase):
   self.assertEqual(len(r),2);self.assertEqual(len({x['entity_id'] for x in r}),2)
   self.assertEqual(r[0]['four_year_academic_fee_inr'],517500)
   self.assertTrue(all(x['four_year_academic_fee_inr']<1000000 for x in r))
+ def test_fee_wording_variation(self):
+  self.assertEqual(len(retrieve('List BTech colleges in Kanpur whose four-year academic fees are below 10 lakh.')['rows']),2)
  def test_year_and_funding_event_identity(self):
   r=retrieve('Find Indian education startups funded in 2026')['rows']
   self.assertEqual(len(r),5);self.assertEqual(len({x['entity_id'] for x in r}),5)
