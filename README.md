@@ -35,6 +35,12 @@ Built for **INFRA SHIFT · PS1: AI-Powered Data Intelligence Platform**. The int
 | General import | CSV/XLSX + column mapping | Reconciled working list and source records |
 | Subscriber review | CSV containing email and optional profile URLs | Reviewable associations; confirmed groups retain all emails |
 
+## Watch the walkthrough
+
+[![Watch the narrated EkList walkthrough](docs/assets/demo-poster.png)](https://github.com/Gourika55/eklist/raw/refs/heads/main/docs/assets/EkList-walkthrough.mp4)
+
+**3 minutes 21 seconds · 1080p · narrated edited screen walkthrough.** Captured live catalogue screens are combined with clearly labelled local-development and historical examples. This is not an uninterrupted recording of every live workflow. [Download the MP4](docs/assets/EkList-walkthrough.mp4).
+
 ## Explore the demo
 
 | Show this | What it demonstrates |

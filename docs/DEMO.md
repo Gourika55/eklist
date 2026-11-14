@@ -71,3 +71,20 @@ The research schema accepts different entities and attributes, but retrieval cov
 
 **Is it production-ready?**
 It is a working local prototype. Shared deployment needs authentication, isolation, rate limiting and operational controls.
+
+
+## Recorded walkthrough
+
+[Download the narrated video](assets/EkList-walkthrough.mp4). Edited captured screens, with live/local/historical labels.
+
+- **0:00** — One question. One usable list. (live deployment)
+- **0:16** — Search the real catalogue. (live deployment)
+- **0:35** — Follow every source row. (live deployment)
+- **0:51** — Hindi or English. Your choice. (live deployment)
+- **1:08** — Opportunities, beyond jobs. (local development corpus)
+- **1:31** — See the connection. Inspect the proof. (local development corpus)
+- **1:45** — Claims with quotations attached. (local development corpus)
+- **2:02** — Bring your own data. (synthetic example · local build)
+- **2:20** — Qualification you can inspect. (historical saved run · local build)
+- **2:39** — Search. Download. Extract. Export. (historical saved run · local build)
+- **2:58** — Build on evidence. Start with EkList. (eklist.vercel.app)
