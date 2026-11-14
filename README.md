@@ -43,11 +43,19 @@ Use **Presenter sign-in** once for provider-powered workflows and uploads. The s
 
 [Open the continuous screen recorder](https://eklist.vercel.app/record.html) to record an actual query-to-export session. Recordings stay in the browser until downloaded; do not reload before saving.
 
+## Watch the verified query demo
+
+[Watch the actual 1440×900 query-to-CSV recording](docs/assets/EkList-judge-demo.mp4). It shows the local full backend using the disclosed reviewed-source pack: two verified college records and five 2026 funding events. Only the initial idle time was trimmed; recorder controls are hidden. Both deployed query-to-CSV API flows were separately tested successfully. [College CSV](examples/verified/Kanpur-BTech-verified-fees.csv) · [Funding CSV](examples/verified/India-education-funding-2026-verified.csv).
+
 ## Watch the walkthrough
 
 [![Watch the narrated EkList walkthrough](docs/assets/demo-poster.png)](https://github.com/Gourika55/eklist/raw/refs/heads/main/docs/assets/EkList-walkthrough.mp4)
 
 **3 minutes 21 seconds · 1080p · narrated edited screen walkthrough.** Captured live catalogue screens are combined with clearly labelled local-development and historical examples. This is not an uninterrupted recording of every live workflow. [Download the MP4](docs/assets/EkList-walkthrough.mp4).
+
+## Reviewed fee and funding demo
+
+The reviewed pack contains two distinct Kanpur BTech institutions with explicit four-year academic/course fee schedules and five distinct India education funding events reported in 2026. Queries use deterministic arithmetic, date and identity checks over the disclosed pack. It does not establish 50 colleges or an exhaustive funding universe. [Source scope and verification](docs/REVIEWED-DEMO.md).
 
 ## Explore the demo
 
