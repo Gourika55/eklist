@@ -1,0 +1,5 @@
+Email,First Name,Last Name,Linkedin,Twitter/X,Company,Role
+reader.one@example.com,Aarav,Mehta,https://in.linkedin.com/in/eklist-demo-person,https://x.com/eklistdemo,Example Media,Editor
+reader.two@example.org,A,Mehta,https://www.linkedin.com/in/eklist-demo-person/,https://twitter.com/eklistdemo,Example Media,Editor
+reader.three@example.net,Aarav,Mehta,https://linkedin.com/in/eklist-demo-person?trk=test,,Example Media,Editor
+different.person@example.com,Aarav,Mehta,https://linkedin.com/in/eklist-demo-other,,Other Example,Editor

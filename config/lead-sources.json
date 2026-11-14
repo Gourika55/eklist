@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "description": "Curated public organiser discovery sources; listing facts are always retrieved, never seeded. Add sources here without changing qualification rules.",
+  "hackathons": [
+    {"url":"https://hackathon.homingo.co.in/hackathons/edition-01","source_type":"organiser","discovered_on":"2026-11-14"},
+    {"url":"https://rackitup.karmaenterprises.tech/","source_type":"organiser","discovered_on":"2026-11-14"},
+    {"url":"https://snh.hiringspectov.com/","source_type":"organiser","discovered_on":"2026-11-14"}
+  ]
+}
