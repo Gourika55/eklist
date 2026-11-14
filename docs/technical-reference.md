@@ -1,4 +1,6 @@
-# EkList — evidence-backed data assembly
+# Technical reference
+
+Historical local-workspace measurements below are not bundled datasets or freshly rerun live-source claims. See the main README for clean-clone setup.
 
 EkList turns a Hindi/English institution request, or user-uploaded tables, into a traceable working list. It provides a national institution catalogue, general CSV/XLSX reconciliation, and a separate subscriber profile-review workflow. It does not certify the truth of a source or discover private identities from the web.
 
@@ -102,7 +104,7 @@ Tests cover Hindi/count parsing, import totals, state filters, invalid plans, pr
 
 This implementation was built with Codex. ML.ai was opened earlier and inspected files, then stopped at the user's request. No ML.ai implementation contribution is claimed. Both provider integrations have been exercised with public queries. API credentials are server-side and excluded from git/archive; no private records were sent to external providers.
 
-This is a functional local prototype, not a production multi-user platform. It does not certify recognition/affiliation, current contact ownership, active inboxes or complete geographic coverage. No generic PDF/HTML ingestion, automatic verified web enrichment, persistent subscriber-review storage, distributed search, or independent human accuracy certification is claimed.
+This is a functional local prototype, not a production multi-user platform. It does not certify recognition/affiliation, current contact ownership, active inboxes or complete geographic coverage. No generic PDF/HTML table-upload ingestion, automatic verified web enrichment, persistent subscriber-review storage, distributed search, or independent human accuracy certification is claimed.
 
 ## Public research → evidence-backed CSV (new)
 
@@ -126,7 +128,7 @@ API: `POST /api/research/jobs` with `{ "query": "..." }`, poll `GET /api/researc
 The **Opportunity Intelligence** workspace adds two domain-specific workflows without replacing the institution, research, import or subscriber tools.
 
 - **Remote jobs:** documented Remotive active-jobs API, up to 100 returned records, source attribution and canonical Remotive links. Six-hour disk cache respects its recommended maximum four retrievals/day. Remotive states that its feed is delayed by 24 hours. Active status is a publisher claim, not employer confirmation. No third-party job-board redistribution or signup gates.
-- **Hackathons:** Hack Club's public Event microdata directory, then individual organiser websites. One bounded Serper search fills source gaps. Up to six organiser pages, first 26,000 characters each. No 403/authentication bypass. Directory pages are not accepted as individual listings.
+- **Hackathons:** A curated organiser URL registry, targeted discovery and Hack Club's public Event microdata directory. One bounded Serper search fills source gaps. Up to eight organiser pages, first 26,000 characters each. No 403/authentication bypass. Directory pages are not accepted as individual listings.
 - NVIDIA interprets Hindi/English into visible typed conditions. Unsupported constraints are shown and prevent automatic qualification; experience, minimum-salary and detailed timezone matching are not implemented. India is the supported country filter; worldwide and explicit India statements qualify, broad APAC or unspecified exception lists remain unknown.
 - Qualification is deterministic over published fields: PASS, FAIL, UNKNOWN, CONFLICT. Qualified means the explicit requested checks passed, not verification of the employer/organiser or a guarantee of acceptance. Eligibility text extracted from pages remains subject to model omission or semantic error; exact quotes prove provenance only.
 - Registration, submission, application and event-start dates are distinct. Timezone-bearing dates are compared against the runtime UTC clock. Date-only deadlines clearly in the past are rejected; ambiguous boundary dates remain unknown. Publication date is not a deadline. Event end does not become registration end.
