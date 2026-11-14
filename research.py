@@ -165,6 +165,7 @@ def accept_extraction(j,doc,out):
     j['metrics']['rejected_extractions']+=rejected
 
 def results(j):
+    if "verified_rows" in j:return j["verified_rows"]
     fields=j.get('plan',{}).get('fields',[]);rows=[];evs={e['id']:e for e in j['evidence']}
     subjects={c['subject_id'] for c in j['claims']}
     for e in j['entities']:
@@ -211,6 +212,10 @@ class ResearchEngine:
     def run(self,j):
         try:
             j['status']='running';save(j)
+            from reviewed import retrieve,populate
+            reviewed=retrieve(j['query'])
+            if reviewed:
+                populate(j,reviewed);save(j);return
             # Existing strict catalogue planner must preserve every requested constraint.
             try:local=self.local(j['query'])
             except Exception:local=None

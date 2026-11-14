@@ -144,7 +144,7 @@ class Handler(SimpleHTTPRequestHandler):
             size=int(self.headers.get('Content-Length','0'))
             if self.path=='/api/demo-recording' and not hosted():
                 if not 0<size<=150*1024*1024:return self.reply(413,{'error':'Recording exceeds 150 MB'})
-                target=BASE.parent/'eklist-demo'/'EkList-live-demo.webm';target.parent.mkdir(parents=True,exist_ok=True)
+                target=BASE.parent/'eklist-demo'/'EkList-judge-demo.webm';target.parent.mkdir(parents=True,exist_ok=True)
                 target.write_bytes(self.rfile.read(size))
                 return self.reply(200,{'saved':str(target)})
             max_size=8*1024*1024 if self.path in ('/api/subscribers/import','/api/files/preview') else 16000

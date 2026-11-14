@@ -1,0 +1,184 @@
+{
+  "reviewed_at": "2026-11-14",
+  "review_method": "Human source review plus deterministic arithmetic, date and identity checks. Evidence entries are concise transcriptions, not verbatim contiguous quotes. Coverage is limited to this reviewed pack.",
+  "colleges": [
+    {
+      "id": "hbtu-kanpur",
+      "name": "Harcourt Butler Technical University",
+      "city": "Kanpur",
+      "course": "B.Tech",
+      "years": [
+        135000,
+        127500,
+        127500,
+        127500
+      ],
+      "source_url": "https://hbtu.ac.in/Admission/2026-27/NOTICE%20AND%20FEE%20STRUCTURE%20OF%20ALL%20PROGRAMS%20FOR%20SESSION%202026-27.pdf",
+      "evidence": "B.TECH. ₹ 135000/- ₹ 127500/- ₹ 127500/- ₹ 127500/-",
+      "locator": "PDF page 2, undergraduate table, B.TECH row",
+      "fee_scope": "Published academic fees; excludes hostel, mess and other personal costs",
+      "fee_session": "2026–27",
+      "sha256": "94e8f595ecfce859270a32bfa254e91560e14e7eab4cde3f8fa8698c8790bafc",
+      "retrieved_url": "https://hbtu.ac.in/Admission/2026-27/NOTICE%20AND%20FEE%20STRUCTURE%20OF%20ALL%20PROGRAMS%20FOR%20SESSION%202026-27.pdf",
+      "bytes": 811392,
+      "download_status": "downloaded"
+    },
+    {
+      "id": "axis-kanpur",
+      "name": "Axis Institute of Technology & Management",
+      "city": "Kanpur",
+      "course": "B.Tech",
+      "years": [
+        120000,
+        120000,
+        120000,
+        120000
+      ],
+      "branch": "Computer Science",
+      "branches": {
+        "CS": [
+          120000,
+          120000,
+          120000,
+          120000
+        ],
+        "CS Data Science": [
+          120000,
+          120000,
+          120000,
+          120000
+        ],
+        "CS AI & ML": [
+          130000,
+          130000,
+          130000,
+          130000
+        ],
+        "IT": [
+          85000,
+          85000,
+          85000,
+          85000
+        ],
+        "EE/EC": [
+          70000,
+          70000,
+          70000,
+          70000
+        ],
+        "ME/CE": [
+          70000,
+          70000,
+          70000,
+          70000
+        ]
+      },
+      "source_url": "https://axiscolleges.org/Fee-Structure/",
+      "evidence": "B.TECH CS 1,20,000 1,20,000 1,20,000 1,20,000",
+      "locator": "Fee Structure table, I–IV YEAR; campus address on same page",
+      "fee_scope": "Published course fees; hostel and transport listed separately; other unlisted charges not certified",
+      "fee_session": "Current schedule retrieved 2026-11-14",
+      "sha256": "6150e3ca04bbf2cd2219fd12ff5c9976cf7c959f211cb1d215b9b67d38a942e1",
+      "retrieved_url": "https://axiscolleges.org/Fee-Structure/",
+      "bytes": 173441,
+      "download_status": "downloaded"
+    }
+  ],
+  "funding": [
+    {
+      "id": "bytexl-2026-10",
+      "name": "byteXL",
+      "country": "India",
+      "sector": "Education",
+      "announcement_reported_on": "2026-10-07",
+      "amount": 9000000,
+      "currency": "USD",
+      "round": "Not specified by this source",
+      "investors": "Elevar Equity; Kalaari Capital; Michael & Susan Dell Foundation",
+      "source_url": "https://yourstory.com/2026/10/edtech-firm-bytexl-9m-investors-back-college-linked-ai-skilling-model",
+      "evidence": "Wednesday October 07, 2026; byteXL has raised $9 million",
+      "locator": "Article headline, publication date and funding paragraph",
+      "date_basis": "Dated public announcement/report; transaction closing date not asserted",
+      "sha256": "1ed4604a87843f21711423d0a8a5f5e06d7e64640b109261849168bbccda7e7c",
+      "retrieved_url": "https://yourstory.com/2026/10/edtech-firm-bytexl-9m-investors-back-college-linked-ai-skilling-model",
+      "bytes": 247850,
+      "download_status": "downloaded"
+    },
+    {
+      "id": "arivihan-2026-09",
+      "name": "Arivihan",
+      "country": "India",
+      "sector": "Education",
+      "announcement_reported_on": "2026-09-30",
+      "amount": 10200000,
+      "currency": "USD",
+      "round": "Series A",
+      "investors": "Accel; Prosus Ventures; GSF-associated angel investors",
+      "source_url": "https://inc42.com/buzz/arivihan-nets-10-2-mn-to-scale-its-ai-tutoring-platform/",
+      "evidence": "30 Sep’26; Arivihan raised $10.2 Mn in Series A",
+      "locator": "Article headline, publication date and funding paragraph",
+      "date_basis": "Dated public announcement/report; transaction closing date not asserted",
+      "sha256": "a756905906c8b57dd39019261c1a2d59f79d4af9232cd405dcf9cc33f88a7398",
+      "retrieved_url": "https://inc42.com/buzz/arivihan-nets-10-2-mn-to-scale-its-ai-tutoring-platform/",
+      "bytes": 605443,
+      "download_status": "downloaded"
+    },
+    {
+      "id": "mesa-2026-10",
+      "name": "Mesa School of Business",
+      "country": "India",
+      "sector": "Education",
+      "announcement_reported_on": "2026-10-13",
+      "amount": 1100000000,
+      "currency": "INR",
+      "round": "Series A equity + venture debt",
+      "investors": "Dharana Capital; Elevation Capital; InnoVen Capital; Alteria Capital",
+      "source_url": "https://www.prnewswire.com/in/news-releases/mesa-school-of-business-raises-110-crore-to-expand-its-portfolio-of-programmes-for-the-ai-era-302905735.html",
+      "evidence": "13 Oct, 2026; Mesa raised ₹110 crore: ~₹85 crore equity and ₹25 crore debt",
+      "locator": "Article headline, publication date and funding paragraph",
+      "date_basis": "Dated public announcement/report; transaction closing date not asserted",
+      "sha256": "15243822857f8bb03a7fdb4af7510152c0ac6854ad11661cb75ead66d3314054",
+      "retrieved_url": "https://www.prnewswire.com/in/news-releases/mesa-school-of-business-raises-110-crore-to-expand-its-portfolio-of-programmes-for-the-ai-era-302905735.html",
+      "bytes": 164680,
+      "download_status": "downloaded"
+    },
+    {
+      "id": "prolearn-2026-06",
+      "name": "ProLearn",
+      "country": "India",
+      "sector": "Education",
+      "announcement_reported_on": "2026-06-02",
+      "amount": 300000000,
+      "currency": "INR",
+      "round": "Pre-seed",
+      "investors": "BEENEXT; Eximius Ventures; Antler; undisclosed angel investors",
+      "source_url": "https://inc42.com/buzz/edtech-startup-prolearn-bags-%E2%82%B930-cr-to-tailor-ai-learning-for-students/",
+      "evidence": "02 Jun’26; ProLearn raised ₹30 Cr in a pre-seed round",
+      "locator": "Article headline, publication date and funding paragraph",
+      "date_basis": "Dated public announcement/report; transaction closing date not asserted",
+      "sha256": "a9ce82d99fbf5fc88daa1b0f9ea2c818bfb0828c5591af7aee5c83d2bfe144d3",
+      "retrieved_url": "https://inc42.com/buzz/edtech-startup-prolearn-bags-%E2%82%B930-cr-to-tailor-ai-learning-for-students/",
+      "bytes": 605657,
+      "download_status": "downloaded"
+    },
+    {
+      "id": "elevate-2026-07",
+      "name": "Elevate Education (formerly Sunstone)",
+      "country": "India",
+      "sector": "Education",
+      "announcement_reported_on": "2026-07-08",
+      "amount": 1700000000,
+      "currency": "INR",
+      "round": "Series D",
+      "investors": "WestBridge Capital",
+      "source_url": "https://yourstory.com/2026/07/elevate-education-bags-170-crore-from-westbridge-capital",
+      "evidence": "Wednesday July 08, 2026; Elevate Education secured Rs 170 crore Series D",
+      "locator": "Article headline, publication date and funding paragraph",
+      "date_basis": "Dated public announcement/report; transaction closing date not asserted",
+      "sha256": "d3b9dac4902700a8f5954cdf4382a3e784621a6ce284c0830be5ff09ed829612",
+      "retrieved_url": "https://yourstory.com/2026/07/elevate-education-bags-170-crore-from-westbridge-capital",
+      "bytes": 219857,
+      "download_status": "downloaded"
+    }
+  ]
+}
