@@ -236,4 +236,4 @@ Hosted mode uses a server-side backend token; the Vercel bridge supports a demo 
 
 ## Engineering attribution
 
-This implementation was developed with Codex. The user supplied public-source packs collected through ML.ai; their manifests were hash-checked and usable snapshots were imported. ML.ai is a development agent, while NVIDIA provides runtime language-model calls. This does not imply ML.ai created every component of this repository. NVIDIA is the configured runtime model provider; Serper supplies search discovery.
+I supplied public-source packs collected through ML.ai; their manifests were hash-checked and usable snapshots were imported. ML.ai is a development agent, while NVIDIA provides runtime language-model calls. This does not imply ML.ai created every component of this repository. NVIDIA is the configured runtime model provider; Serper supplies search discovery.
