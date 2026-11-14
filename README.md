@@ -35,6 +35,14 @@ Built for **INFRA SHIFT · PS1: AI-Powered Data Intelligence Platform**. The int
 | General import | CSV/XLSX + column mapping | Reconciled working list and source records |
 | Subscriber review | CSV containing email and optional profile URLs | Reviewable associations; confirmed groups retain all emails |
 
+## Live verification
+
+On 14 November 2026, the deployed frontend and backend completed catalogue queries in English and Hindi, source inspection, library filtering and graph inspection, fresh jobs/hackathon/NGO research, subscriber CSV review, and general CSV import. Downloaded research and opportunity CSVs were checked separately. [Read the results and limitations](docs/LIVE-VERIFICATION.md).
+
+Use **Presenter sign-in** once for provider-powered workflows and uploads. The session uses the existing deployment credentials; credentials are never included in this repository. Public catalogue and library browsing remain available without sign-in.
+
+[Open the continuous screen recorder](https://eklist.vercel.app/record.html) to record an actual query-to-export session. Recordings stay in the browser until downloaded; do not reload before saving.
+
 ## Watch the walkthrough
 
 [![Watch the narrated EkList walkthrough](docs/assets/demo-poster.png)](https://github.com/Gourika55/eklist/raw/refs/heads/main/docs/assets/EkList-walkthrough.mp4)
@@ -54,7 +62,7 @@ Built for **INFRA SHIFT · PS1: AI-Powered Data Intelligence Platform**. The int
 | Import CSV / XLSX | Map your own columns and reconcile a working list |
 | Jobs / hackathon query | Separate qualified listings from missing evidence and excluded results |
 
-**Development snapshot, 14 November 2026:** 74,847 institution rows / 73,401 distinct AISHE identifiers; 80 source-scoped opportunity-library candidates across seven clusters. Of these, 41 candidates came from the supplied local public-source packs. These measurements describe the local development corpus, not a guarantee that the hosted deployment has imported the same data or that every candidate is currently open.
+**Development snapshot, 14 November 2026:** 74,847 institution rows / 73,401 distinct AISHE identifiers; 80 source-scoped opportunity-library candidates across seven clusters. Of these, 41 candidates came from the supplied local public-source packs. The hosted opportunity library was verified at 80 records on 14 November 2026. These are source-scoped candidates, not 80 certified or currently open opportunities. The bundled public seed restores the library on a fresh hosted start.
 
 ## Deploy the full stack
 

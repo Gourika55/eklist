@@ -1,0 +1,4 @@
+name,entity_id,state,district,website,source_url
+Example Learning Centre,demo:001,Rajasthan,Jaipur,https://example.org,https://example.org/source-a
+Example Learning Centre,demo:001,Rajasthan,Jaipur,https://example.org,https://example.org/source-b
+Example Community Lab,demo:002,Delhi,New Delhi,https://example.com,https://example.com/source-a
