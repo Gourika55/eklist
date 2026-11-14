@@ -4,7 +4,7 @@ import json,os,re,time,threading,urllib.request,urllib.error,base64,zipfile,io,c
 from http.server import ThreadingHTTPServer,SimpleHTTPRequestHandler
 from pathlib import Path
 from urllib.parse import urlsplit,parse_qs
-from catalog import metadata,rules_plan,validate_plan,query_catalog
+from catalog import metadata,rules_plan,validate_plan,query_catalog,needs_research
 from subscribers import demo,load_private,import_csv
 from ingest import xlsx_rows
 from hosting import hosted,authorized,validate_hosting
@@ -77,7 +77,7 @@ def research_llm(system,user):
 
 def research_local(query):
     # Rules alone cannot certify that a broad research request is fully covered.
-    if not KEY:return None
+    if not KEY or needs_research(query):return None
     planned=plan_query(query,True)
     if planned['engine']!='NVIDIA Nemotron':return None
     return query_catalog(planned['plan'])
@@ -142,6 +142,11 @@ class Handler(SimpleHTTPRequestHandler):
         if not self.allowed():return self.reply(403,{'error':'Local access only'})
         try:
             size=int(self.headers.get('Content-Length','0'))
+            if self.path=='/api/demo-recording' and not hosted():
+                if not 0<size<=150*1024*1024:return self.reply(413,{'error':'Recording exceeds 150 MB'})
+                target=BASE.parent/'eklist-demo'/'EkList-live-demo.webm';target.parent.mkdir(parents=True,exist_ok=True)
+                target.write_bytes(self.rfile.read(size))
+                return self.reply(200,{'saved':str(target)})
             max_size=8*1024*1024 if self.path in ('/api/subscribers/import','/api/files/preview') else 16000
             if not 0<size<=max_size:return self.reply(413,{'error':'Request exceeds endpoint size limit'})
             data=json.loads(self.rfile.read(size));path=urlsplit(self.path).path

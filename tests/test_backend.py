@@ -4,6 +4,10 @@ from subscribers import profile,reconcile,demo
 FIXTURE_META={'states':['Delhi','Uttar Pradesh'],'districts':['New Delhi','Lucknow'],'categories':['college','university','standalone','research','vidyalaxmi']}
 
 class BackendTests(unittest.TestCase):
+ def test_fee_query_never_silently_drops_constraints(self):
+  with self.assertRaisesRegex(ValueError,'public-source research'):
+   rules_plan('Find 50 btech colleges in kanpur that have fees less than 10 lakh for 4 years',FIXTURE_META)
+
  @unittest.skipUnless(os.environ.get("EKLIST_CATALOG_INTEGRATION")=="1", "Requires imported national catalogue; set EKLIST_CATALOG_INTEGRATION=1")
  def test_national_import(self):self.assertEqual(metadata()['raw_records'],74847)
  @unittest.skipUnless(os.environ.get("EKLIST_CATALOG_INTEGRATION")=="1", "Requires imported national catalogue; set EKLIST_CATALOG_INTEGRATION=1")
