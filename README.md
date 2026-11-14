@@ -1,142 +1,165 @@
-# EkList — evidence-backed data assembly
+# EkList
 
-EkList turns a Hindi/English institution request, or user-uploaded tables, into a traceable working list. It provides a national institution catalogue, general CSV/XLSX reconciliation, and a separate subscriber profile-review workflow. It does not certify the truth of a source or discover private identities from the web.
+### Scattered sources. One list. Evidence attached.
 
-## Run
+EkList is a local-first data and lead research workspace. Ask in English or Hindi, search an imported institution catalogue, assemble public-source research, reconcile uploaded tables, and export CSVs with their evidence.
 
-Python 3.11+ and a modern browser are sufficient for the application. Node 18+ runs the frontend tests.
+Built for **INFRA SHIFT · PS1: AI-Powered Data Intelligence Platform**. The interface combines a black-and-white workspace, crimson accents, and lightweight CSS 3D cards.
+
+**A lead can be an institution, organisation, opportunity, or research candidate.** Different workflows have different guarantees: general research produces evidence-linked candidates; jobs and hackathons additionally apply explicit qualification rules.
+
+## What you can do
+
+| Workflow | Inputs | Result |
+|---|---|---|
+| Institution search | Hindi/English request + imported workbooks | Filtered catalogue, original records, CSV |
+| Public research | Research objective | Downloaded public sources, entities, claims, evidence, gaps, CSV |
+| Remote jobs | India-based eligibility and supported conditions | Qualified / needs verification / excluded listings |
+| Hackathons | Supported country, mode, age and deadline conditions | Rule outcomes, cited fields, separate registration and event dates |
+| General import | CSV/XLSX + column mapping | Reconciled working list and source records |
+| Subscriber review | CSV containing email and optional profile URLs | Reviewable associations; confirmed groups retain all emails |
+
+## Quick start
+
+Requires **Python 3.11+** and a modern browser. **Node 18+** runs JavaScript tests. The Python server uses standard-library modules; no pip installation is needed. Install Poppler's `pdftotext` separately if you want text-based PDF extraction.
 
 ```sh
-PORT=4174 python3 server.py
+git clone https://github.com/Gourika55/eklist.git
+cd eklist
+cp .env.example .env
+python3 server.py
 ```
 
-Open http://localhost:4174. The server binds to loopback only. Keep this terminal running for the demo. Do not host this server on the public internet without adding authentication, request throttling, deployment configuration and proper data-access controls.
+Open **http://localhost:4174**. Keep the terminal running. The server binds to loopback; this is a local prototype, not a ready-to-deploy shared service.
 
-The current workspace already has the imported SQLite database and local credentials. Credentials are in ignored `.env`, never browser code or the handoff archive. For a fresh copy, fill `.env` using `.env.example`. No key is required when the NVIDIA checkbox is disabled. The private contact CSV is not included in the archive; use the upload workflow instead.
+### Configure providers
 
-## Data actually integrated
+Edit `.env` locally:
 
-| Imported file | Source rows |
-|---|---:|
-| Colleges | 54,574 |
-| Universities | 1,438 |
-| Standalone institutions | 17,092 |
-| R&D institutes | 291 |
-| PM Vidyalaxmi | 1,452 |
-| Total | 74,847 |
+| Variable | Purpose |
+|---|---|
+| `NVIDIA_API_KEY` | Natural-language planning and public-source extraction |
+| `EKLIST_MODEL` | Default: `nvidia/nemotron-3.5-super-vl-120b-a12b` |
+| `EKLIST_API_BASE` | Default: `https://integrate.api.nvidia.com/v1` |
+| `SERPER_API_KEY` | Bounded public-source discovery |
+| `PORT` | Default: `4174` |
+| `EKLIST_PRIVATE_CONTACTS_PATH` | Optional local contact CSV; otherwise use upload |
 
-There are 73,401 distinct AISHE codes, not 74,847 distinct institutions. The exports state November 14, 2026; that is an export label, not a per-record verification date. State labels are retained as supplied; do not interpret their raw distinct count as a count of current Indian states.
+Never put keys in frontend files or commit `.env`. Local rules-based catalogue queries can run without provider keys once the catalogue is imported. Public research and AI planning require the corresponding services; configuring a model name does not guarantee provider availability.
 
-`python3 ingest.py` rebuilds the catalogue from the five specifically named XLSX files in Downloads. This replaces the generated institution database, not source files. Source filename, original row, original values and file SHA-256 are preserved. The workbook source URL was not supplied, so no per-record official URL is invented. Websites listed in records remain source claims.
+### Populate the institution catalogue
 
-## Three usable workflows
+**The GitHub repository does not contain the local database or source workbooks.** Download the source workbooks yourself and place these filenames in your Downloads folder:
 
-### Institution requests
+```text
+College-ALL COLLEGE.xlsx
+University-ALL UNIVERSITIES.xlsx
+Standalone-ALL STANDALONE.xlsx
+R & D Institutes.xlsx
+vidya_lakshmiAll.xlsx
+```
 
-Examples: `Find 50 colleges in Delhi`, `उत्तर प्रदेश के 50 कॉलेज दिखाओ`, `Find 100 universities in India`, `Find 50 research institutes in India`.
+Then run:
 
-NVIDIA `nvidia/nemotron-3.5-super-vl-120b-a12b` proposes JSON filters. The backend validates category, state, district, count, management and website requirements. Parameterized SQLite queries retrieve real records. Results are alphabetical, not a ranking. Maximum 500 entities per query; all 74,847 source rows remain searchable. There is no automatic all-India download through the UI.
+```sh
+python3 ingest.py
+```
 
-A returned AISHE code retrieves all its source records. Source disagreements remain available. Code links identifiers; the model never generates institutions. The initial page load deliberately uses rules, so merely opening the app does not spend model tokens. Query-plan caching is memory-only. Invalid model output is rejected; provider failures may use an explicitly labelled rules fallback. Review the displayed filters.
+This rebuilds `data/eklist.sqlite`; it replaces the generated catalogue. The importer expects the supplied workbook layout, including its header rows. Generic files belong in the UI's **Import CSV / XLSX** workflow instead.
 
-### Any user-supplied table
+The development dataset contained **74,847 source rows and 73,401 distinct AISHE identifiers**. These are measurements of that local import, not rows bundled with this repository or a promise of complete/current national coverage. The importer retains filenames, source rows, original values and file hashes. It does not invent missing publisher URLs.
 
-Choose **Import CSV / XLSX**, select a file, choose the header row, preview the columns, map fields, and optionally enter its source URL. Choose whether to append to current results or replace the working list. Multiple files can be imported sequentially.
+## How intelligence works
 
-Supported mappings: name, shared entity ID, state, district, website, email, phone, address, category and source URL. Unmapped values remain in the original-record evidence. XLSX uses its first worksheet. File size limit: 5 MB; combined working-list limit: 5,000 records. The table displays the first 100 matching rows; use search to narrow it and export to obtain all rows. Existing national datasets use the dedicated importer, so the UI limit does not reduce catalogue coverage.
+```mermaid
+flowchart LR
+    Q[Hindi / English request] --> P[Plan and validate fields]
+    P --> L[Supported local catalogue query]
+    P --> W[Bounded public-source discovery]
+    W --> D[Download and retain source snapshots]
+    D --> E[Extract claims and locate quotes]
+    L --> R[Records and original evidence]
+    E --> R
+    R --> C[Domain rules and identity checks]
+    C --> U[Results, gaps and evidence review]
+    U --> X[CSV exports]
+```
 
-AISHE-style codes get a consistent namespace. Other identifiers must already be genuinely shared, preferably prefixed with their source namespace. A row number is not identity. Missing names are flagged through an explicit placeholder. Phone/address/name matches suggest review; they do not prove identity. Large lists use bounded candidate blocking (first 50 records per non-ID block), so possible-match recall is limited and not claimed complete.
+- **Models propose structure.** NVIDIA interprets requests and extracts public-source claims. Code validates supported filters and output structure.
+- **Sources supply records.** SQLite supplies catalogue records; public downloads supply research text. The model is not the institution database.
+- **Matching uses explicit evidence.** Exact AISHE identifiers link catalogue rows. Similar names alone do not prove identity. Subscriber profile associations still require review.
+- **Qualification uses rules.** Opportunity checks produce PASS, FAIL, UNKNOWN or CONFLICT. Missing evidence stays unknown rather than becoming a positive result.
+- **Quotes establish provenance, not truth.** An exact quote can still be misinterpreted, outdated or incomplete. Research claims remain unreviewed.
 
-### Subscriber CSV
+## Sources, freshness and search budgets
 
-Choose **Subscriber studio → Upload subscriber CSV**. Map email, name, personal LinkedIn/X URL, company, role and country where present. Only email is required; without usable profile associations, records stay separate. Up to 50,000 rows / 5 MB.
+| Path | Source policy |
+|---|---|
+| Catalogue | User-provided institution workbooks; local queries first |
+| Catalogue search fallback | Explicit user action; one bounded Serper search |
+| Public research | Supported catalogue retrieval where possible; otherwise up to two searches and six downloads |
+| Jobs | Remotive active-jobs API; six-hour cache; publisher reports a 24-hour feed delay |
+| Hackathons | Organiser URLs in `config/lead-sources.json`, targeted Serper discovery and Hack Club fallback |
 
-The matcher normalizes regional LinkedIn hosts, trailing slashes and tracking parameters, and maps twitter.com/x.com to one profile form. Personal-profile patterns are required; generic LinkedIn company pages do not count. Country disagreements do not block association. No country-resolution workflow is performed.
+The hackathon registry contains discovery URLs, not prefilled listing facts. Eligibility and deadlines must come from retrieved pages. Source coverage is bounded and changes over time; an old successful demo does not prove registration remains open.
 
-Shared-profile groups are candidates: enrichment could have attached the wrong profile. Confirm same person or keep separate; decisions are reversible within the session. Download the subscriber list CSV: confirmed groups become one row containing all emails; unconfirmed records and singletons remain separate. No email is automatically selected as active. The supplied contact data has no required engagement, bounce or consent events for that decision.
+Research downloads support public HTML, text, CSV, first-sheet XLSX and text-based PDFs. Limits include 3 MB per source and bounded extracted text. No OCR, login bypass or exhaustive crawling is implemented. Source gaps and parsing failures are retained.
 
-A fictional four-record example is provided in `examples/subscribers-fictional.csv`. It is not presented as independently discovered real data. The private local file contains 10,316 rows; the current algorithm found 12 candidate groups covering 46 rows. It is never sent to NVIDIA or Serper. Private-file shortcuts are for this local machine only. Uploaded data is not written to disk by the import endpoint; it remains in process/browser memory and user-triggered exports.
+Source references: [Remotive API](https://github.com/remotive-com/remote-jobs-api), [Hack Club directory](https://github.com/hackclub/hackathons). Check each publisher's reuse terms before redistributing downloaded data.
 
-## Search as last resort
+## Evidence and exports
 
-Local catalogue retrieval is always first. **Search official sources · Serper** makes one bounded search only when clicked; ordinary catalogue requests make zero Serper calls. Searches request five results and are cached in server memory for one hour. UI labels actual search calls and cache hits. No unmeasured cost-saving percentage is claimed.
+General research exposes `results`, `entities`, `claims`, `evidence`, `sources` and `gaps` CSVs. Jobs/hackathons expose `qualified`, `needs_verification`, `excluded`, `all`, `evidence`, `duplicates` and `gaps` exports.
 
-Search results are discovery links/snippets, not automatically accepted facts. Use **Upload downloaded data** in that dialog after obtaining a CSV/XLSX from the source. PDFs/HTML can be retained as supporting evidence, but generic PDF-to-table upload is not implemented. Search does not automatically crawl arbitrary websites or enrich private contacts.
+A qualified opportunity means the supported requested checks passed on published fields. It does not certify the organiser, employer, admission decision or acceptance. Registration deadlines are kept separate from submission deadlines and event dates.
 
-## Research source packs
+Subscriber exports preserve all emails in confirmed groups. **EkList does not infer an active inbox or permission to contact someone from their name, role or profile.**
 
-`data/source-packs.json` records 27 attempted sources: 20 institution home/contact-page snapshots and two historical DU admission bulletins downloaded; five source requests failed. There are dedicated contact-page captures where discoverable, otherwise the homepage snapshot is retained. Email extraction is regex-based candidate extraction, not deliverability or independent verification.
+## Project map
 
-Seventeen catalogue identities matched uniquely to captured website hostnames. These are attached as supporting evidence in the record drawer. Ambiguous website hosts are not auto-associated. DU admission bulletins cover 2024–25 and 2025–26. They are not complete historical institution master lists; absence is not interpreted as closure. Snapshots retain URLs, retrieval timestamps and hashes. Their redistribution licenses have not been established; the handoff is a local research bundle, not a public data release.
+```text
+dist/                 Browser UI, reconciliation logic, crimson 3D theme
+server.py             Local HTTP server and API routes
+catalog.py            Validated catalogue planning and SQLite queries
+ingest.py             Institution workbook importer
+research.py           Public downloads, claims, evidence and research jobs
+opportunities.py      Job/hackathon connectors and qualification rules
+subscribers.py        CSV mapping and profile-association candidates
+config/               Public-source discovery registry
+scripts/              Source collection and benchmark utilities
+tests/                Python and JavaScript checks
+examples/             Fictional subscriber CSV
+docs/                 Demo guide and detailed implementation reference
+data/                 Generated local state; excluded from Git
+```
 
-## Matching and measurements
-
-Production catalogue auto-linking uses exact AISHE identifiers. Fuzzy name comparisons only create review candidates. Subscriber association uses explicit normalized profiles and requires user review for final list consolidation. Original records survive merging.
-
-`python3 scripts/benchmark.py` records a reproducible identifier-labelled benchmark and local performance measurements in `reports/benchmark.json`. It samples 500 same-ID pairs and 500 different-ID hard negatives, with seed 17. IDs are withheld from the evaluated name/location candidate function. Labels come from source identifiers, not an LLM, but they are not independent human audits. The candidate function is evaluation-only, distinct from production exact-ID linking.
-
-Current proxy results: 420 true positives, 0 false positives, 80 false negatives, 500 true negatives; precision 100% and recall 84% on this sample. Exact-name baseline recall: 72.6%. Do not advertise this as 100% real-world accuracy. Some source-family overlaps are easy; identifier labels can contain errors. A held-out human-reviewed identity benchmark remains outstanding.
-
-Current database performance: 25 query runs, median about 50 ms; maximum about 533 ms including cold evidence-index initialization. AI and network time excluded. This is not a multi-user load test. Query timings are displayed live and will vary by machine.
-
-## Validation
+## Test and evaluate
 
 ```sh
 python3 -m unittest discover -s tests -p 'test_*.py'
 npm test
+```
+
+Portable tests use fixtures and do not need API keys. National-catalogue integration tests are explicitly skipped unless enabled after importing the development workbooks:
+
+```sh
+EKLIST_CATALOG_INTEGRATION=1 python3 -m unittest discover -s tests -p 'test_*.py'
 python3 scripts/benchmark.py
 ```
 
-Tests cover Hindi/count parsing, import totals, state filters, invalid plans, provenance, profile normalization, no name-only subscriber linking, CSV mapping, malformed files, geographic conflicts and safe exports. Browser checks cover NVIDIA Hindi query, real-record CSV export, evidence drawer, private-file aggregate view, subscriber CSV import/confirmation/export and XLSX header mapping/import.
+The benchmark uses identifier-derived labels, not independent human labels. Its precision/recall must not be advertised as overall real-world accuracy. Completeness and source coverage are separate measurements. Live-provider checks are manual and can incur API usage.
 
-## Demo script
+## Demo and technical details
 
-1. Show the national dataset counts and ask for 50 UP colleges in Hindi.
-2. Show the parsed filters, NVIDIA engine, result count, local query time and zero search calls.
-3. Query Delhi; open Acharya Narendra Dev College to show original source rows and supporting official-site evidence.
-4. Export CSV, then show the general import workflow using the R&D workbook (header row 3).
-5. Open the fictional subscriber CSV, confirm the three-email group, and export two final rows from four input rows.
-6. Show the measured-results panel with its evaluation limitations. Demonstrate Serper only when additional evidence is needed.
+- [Five-minute demonstration and fallback plan](docs/DEMO.md)
+- [Detailed workflows, API examples, measurements and limitations](docs/technical-reference.md)
 
-## Engineering attribution and limits
+## Privacy and deployment boundaries
 
-This implementation was built with Codex. ML.ai was opened earlier and inspected files, then stopped at the user's request. No ML.ai implementation contribution is claimed. Both provider integrations have been exercised with public queries. API credentials are server-side and excluded from git/archive; no private records were sent to external providers.
+Credentials, private contacts, downloaded snapshots, local databases and workspace reports are excluded from the public code distribution. Uploaded contacts are not sent to NVIDIA or Serper. Public research sends public queries and downloaded excerpts to configured providers.
 
-This is a functional local prototype, not a production multi-user platform. It does not certify recognition/affiliation, current contact ownership, active inboxes or complete geographic coverage. No generic PDF/HTML ingestion, automatic verified web enrichment, persistent subscriber-review storage, distributed search, or independent human accuracy certification is claimed.
+Before a shared deployment, add authentication, access isolation, rate limits, operational monitoring and appropriate data-retention controls. Persistent subscriber decisions, exhaustive cross-source entity resolution, arbitrary eligibility verification and independent factual certification are not implemented.
 
-## Public research → evidence-backed CSV (new)
+## Engineering attribution
 
-Open **Research → CSV** or the Research Workspace. Enter an objective across domains, such as space missions and launch dates, organisations and programmes, or institutions and public partnerships. The new workflow runs alongside the existing institution/subscriber/import features.
-
-- Persistent background jobs in `data/research.sqlite`, with additive entity, claim, evidence and source-document tables. No migration or replacement of the national catalogue.
-- A strict institution query uses the existing catalogue when supported. Other requests use a flexible NVIDIA-generated field plan, up to two Serper searches and six public downloads.
-- The backend downloads public HTML, text, CSV, XLSX and text-based PDFs itself. `pdftotext` is required for PDFs. Up to 3 MB per source, first worksheet for XLSX, first 22,000 extracted characters per document are passed to NVIDIA. Truncation/failures appear in gaps. No OCR or authenticated crawling.
-- Downloaded bytes are stored by SHA256 in `data/research-sources/`; parsed source text and timestamps persist in SQLite. Private subscriber files and user imports are not sent to research providers.
-- An attribute must have an exact located quote containing the subject name and extracted value. Relationship quotes must contain both names. These deterministic checks establish textual provenance only; the model's interpretation and relevance remain **unreviewed**, not independently verified. Co-mention can still be misinterpreted; inspect evidence before relying on relationships.
-- Same names across web sources remain separate rather than being automatically merged. Exact AISHE codes still link catalogue records. The research layer does not yet implement cross-source fuzzy identity review or persistent claim acceptance.
-- Dataset, evidence explorer and clickable relationship adjacency view are available. This is a SQLite-backed evidence graph, not a separate Neo4j deployment or general-purpose multi-hop query engine.
-- Download `results.csv` (up to requested count), `entities.csv`, `claims.csv`, `evidence.csv`, `sources.csv`, and `gaps.csv`. All candidates are retained in the supporting exports. Missing requested values remain blank. A row is a source-backed candidate, not certification that all query criteria are met.
-- Jobs survive page refresh. A server restart marks unfinished jobs interrupted, preserving partial evidence. One research job runs at a time. Recent jobs can be reopened.
-- Public-network addresses are checked on each redirect; connections are pinned to the checked IP, HTTPS certificates remain verified, and response/expanded-workbook limits are enforced. Research text is treated as data, not executable instructions.
-
-API: `POST /api/research/jobs` with `{ "query": "..." }`, poll `GET /api/research/jobs/{id}`, download `GET /api/research/jobs/{id}?export=results` (or the other export kinds). `GET /api/research/jobs` lists recent runs. Public research uses the configured NVIDIA and Serper credentials; local institution retrieval is preferred when the strict planner can fully represent the request.
-
-## Remote jobs and hackathons
-
-The **Opportunity Intelligence** workspace adds two domain-specific workflows without replacing the institution, research, import or subscriber tools.
-
-- **Remote jobs:** documented Remotive active-jobs API, up to 100 returned records, source attribution and canonical Remotive links. Six-hour disk cache respects its recommended maximum four retrievals/day. Remotive states that its feed is delayed by 24 hours. Active status is a publisher claim, not employer confirmation. No third-party job-board redistribution or signup gates.
-- **Hackathons:** Hack Club's public Event microdata directory, then individual organiser websites. One bounded Serper search fills source gaps. Up to six organiser pages, first 26,000 characters each. No 403/authentication bypass. Directory pages are not accepted as individual listings.
-- NVIDIA interprets Hindi/English into visible typed conditions. Unsupported constraints are shown and prevent automatic qualification; experience, minimum-salary and detailed timezone matching are not implemented. India is the supported country filter; worldwide and explicit India statements qualify, broad APAC or unspecified exception lists remain unknown.
-- Qualification is deterministic over published fields: PASS, FAIL, UNKNOWN, CONFLICT. Qualified means the explicit requested checks passed, not verification of the employer/organiser or a guarantee of acceptance. Eligibility text extracted from pages remains subject to model omission or semantic error; exact quotes prove provenance only.
-- Registration, submission, application and event-start dates are distinct. Timezone-bearing dates are compared against the runtime UTC clock. Date-only deadlines clearly in the past are rejected; ambiguous boundary dates remain unknown. Publication date is not a deadline. Event end does not become registration end.
-- Missing salary, missing registration status, broad geographic eligibility and omitted age remain visible. Age constraints are checked when published. Source caveats about payment to access work are flagged for review. Arbitrary employment/eligibility requirements cannot all be certified from these connectors.
-- Exact source IDs or canonical URL + edition start deduplicate. Different requisitions/editions remain separate. Conflicting values are flagged and original evidence preserved. Name-only fuzzy cross-board identity matching is not implemented. Duplicate decisions export separately; no opportunity-specific manual merge UI yet.
-- Search/filter Qualified, Needs verification, Excluded or All. Inspect rule outcomes and supporting source field paths/quotes. Download complete category CSVs plus evidence, duplicate decisions and gaps. Text search also filters result-category CSV exports; evidence and audit exports retain all records.
-- Runs and source snapshots persist locally in `data/opportunities/`. API: `POST /api/opportunities` with `{kind:"jobs"|"hackathons",query:"..."}`, `GET /api/opportunities/{id}`, `?export=qualified|needs_verification|excluded|all|evidence|duplicates|gaps`. Two concurrent runs maximum; restart marks unfinished runs interrupted. No private uploaded/subscriber data goes to these providers.
-
-Source documentation: https://github.com/remotive-com/remote-jobs-api and https://github.com/hackclub/hackathons . Source coverage is bounded, not exhaustive. Review recorded source restrictions before redistributing data.
-
-## Repository distribution
-
-This repository contains application code, tests, and fictional examples. Local institution databases, downloaded source snapshots, private contacts, credentials, and workspace reports are excluded. Import your source workbooks to populate the catalogue. Use CSV upload for contacts, or configure EKLIST_PRIVATE_CONTACTS_PATH locally.
+This implementation was developed with Codex. ML.ai is an intended development tool for further ingestion, testing and maintenance work; this repository does not claim unperformed ML.ai contributions. NVIDIA is the configured runtime model provider; Serper supplies search discovery.
