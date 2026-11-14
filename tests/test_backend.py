@@ -1,15 +1,20 @@
-import unittest
+import unittest, os
 from catalog import rules_plan,query_catalog,validate_plan,metadata
 from subscribers import profile,reconcile,demo
+FIXTURE_META={'states':['Delhi','Uttar Pradesh'],'districts':['New Delhi','Lucknow'],'categories':['college','university','standalone','research','vidyalaxmi']}
+
 class BackendTests(unittest.TestCase):
+ @unittest.skipUnless(os.environ.get("EKLIST_CATALOG_INTEGRATION")=="1", "Requires imported national catalogue; set EKLIST_CATALOG_INTEGRATION=1")
  def test_national_import(self):self.assertEqual(metadata()['raw_records'],74847)
+ @unittest.skipUnless(os.environ.get("EKLIST_CATALOG_INTEGRATION")=="1", "Requires imported national catalogue; set EKLIST_CATALOG_INTEGRATION=1")
  def test_up_request(self):
   p=rules_plan('Find 50 colleges in UP');self.assertEqual(p['state'],'Uttar Pradesh');r=query_catalog(p);self.assertEqual(r['returned_entities'],50);self.assertTrue(all(x['state']=='Uttar Pradesh' for x in r['records']))
- def test_hindi_count(self):self.assertEqual(rules_plan('दिल्ली के २५ कॉलेज दिखाओ')['limit'],25)
+ def test_hindi_count(self):self.assertEqual(rules_plan('दिल्ली के २५ कॉलेज दिखाओ',FIXTURE_META)['limit'],25)
  def test_unknown_state(self):
-  with self.assertRaises(ValueError):validate_plan({'category':'college','state':'Atlantis'})
+  with self.assertRaises(ValueError):validate_plan({'category':'college','state':'Atlantis'},FIXTURE_META)
  def test_invalid_limit(self):
-  with self.assertRaises(ValueError):validate_plan({'category':'college','limit':-1})
+  with self.assertRaises(ValueError):validate_plan({'category':'college','limit':-1},FIXTURE_META)
+ @unittest.skipUnless(os.environ.get("EKLIST_CATALOG_INTEGRATION")=="1", "Requires imported national catalogue; set EKLIST_CATALOG_INTEGRATION=1")
  def test_linkage_evidence(self):
   r=query_catalog({'category':'vidyalaxmi','limit':100});self.assertTrue(all(x['source_row']>3 and x['original'] for x in r['records']));self.assertLessEqual(len(set(x['entity_id'] for x in r['records'])),100)
  def test_profile_urls(self):self.assertEqual(profile('https://in.linkedin.com/in/Person/?trk=a','linkedin'),profile('https://www.linkedin.com/in/person','linkedin'))
